@@ -121,6 +121,7 @@ sed 's/^\(>.*\)$/\1 Brassica rapa/' infile
 awk '/^>/ {$0=$0 " Brassica rapa"}1' in.fa >out.fa　　　#1条件为真时
 awk '/^>/{$0=$1}1'  ara.cds >ara.cds2
 awk '{for (m=1;m<=NF;m+=3){printf $m"\t"}}{print "\n"}' test | sed -e /^$/d -e s'/\t$//g'
+awk '$11+0<1e-5' parent2nocoding.blat.txt  > p2n_1e-5.txt  # 科学计数法
 **************************************************************************************************************************
 
 Sort排序
