@@ -1,5 +1,5 @@
 # shell_scripts
-过滤基因组测序数据trim_galore
+## 过滤基因组测序数据trim_galore
 
     export PAHH=$PATH:/share/nas1/fansh/wuzefeng/softs/cutadapter/bin
     ./trim_galore --phred33  --fastqc  -a  AATGATACGGCGACCACCGAGATCTACACTATCCTCTTCGTCGGCAGCGTC  -a2 CAAGCAGAAGACGGCATACGAGATTTCTGCCTGTCTCGTGGGCTCGG -o /share/nas1/fansh/kp-genome/trim --paired -t /share/nas1/fansh/kp-genome/new_miseq_paired_samll_than_300bp/2783_5992_8703_H8PKBADXX_i2_AGGCAGA_TATCCTC_R1.fastq /share/nas1/fansh/kp-genome/new_miseq_paired_samll_than_300bp/2783_5992_8703_H8PKBADXX_i2_AGGCAGA_TATCCTC_R2.fastq 
@@ -7,62 +7,62 @@
     ./trim_galore --phred33  --fastqc  -a  AATGATACGGCGACCACCGAGATCTACACTAGATCGCTCGTCGGCAGCGTC  -a2 CAAGCAGAAGACGGCATACGAGATTCGCCTTAGTCTCGTGGGCTCGG -o /share/nas1/fansh/kp-genome/trim --paired -t /share/nas1/fansh/kp-genome/old_mix_two_genome_miseq_paired/2_S2_L001_R1_001.fastq  /share/nas1/fansh/kp-genome/old_mix_two_genome_miseq_paired/2_S2_L001_R2_001.fastq
 
 
-对基因组进行拼接spades.py
+## 对基因组进行拼接spades.py
 
     nohup python spades.py  -o /share/nas1/fansh/kp-genome/assembly -1 /share/nas1/fansh/kp-genome/trim/2783_5992_8703_H8PKBADXX_i2_AGGCAGA_TATCCTC_R1_val_1.fq -2  /share/nas1/fansh/kp-genome/trim/2783_5992_8703_H8PKBADXX_i2_AGGCAGA_TATCCTC_R2_val_2.fq -t 30 -m 128 &
 
 
-对植物pif1的fasta运行meme
+## 对植物pif1的fasta运行meme
 
     meme.bin  /share/nas1/fansh/wuzefeng/softs/hmmer-3.0-linux-intel-x86_64/pif1p_hmm_out/phytozome/phytozome_pif1-1e_-10_fasta/pif1_-10plant.fasta -o meme_plant_pif1_50.out -p protein -nmotifs 50 -maxsize 700000 
 
 
-搜索基因组翻译后的pif1-motif
+## 搜索基因组翻译后的pif1-motif
 
     hmmsearch -E 1e-5 -o  pif1p_hmm_out/phytozome/genome_translation/Zea_mays/Zea_mays_trans_pif1_align.out pif1p_hmm_out/phytozome/genome_translation/Zea_mays/Zea_mays.AGPv3.21.dna.genome.fa
 
     hmmsearch -E 1e-5 --domtblout  pif1p_hmm_out/phytozome/genome_translation/arabidopsis/ara_pif1_domain_table_out a.hmm  /share/nas1/fansh/wuzefeng/softs/hmmer-3.0-linux-intel-x86_64/pif1p_hmm_out/phytozome/genome_translation/arabidopsis/translation.fasta 
 
-Blast常用命令
+## Blast常用命令
 
     formatdb -i genome.fast -p F  -n database_bame
     blastall -i query.fasta -d database_name -p blastn -e 1 -m 9 -o oufie
 
 
-blast+
+## blast+
 
     makeblastdb -in test.fa -input_type fasta -dbtype nucl(prot)  #构建数据库
     blastp -db dbname -query test1.fasta -out test.all.blot -outfmt 7 -num_threads 8 -evalue 1e-5
 
-Usearch7.0
-1.小内存
+## Usearch7.0
+### 1.小内存
 
     usearch -sortbylength seqs.fasta -output seqs_sorted.fasta -minseqlength 64
     usearch -cluster_smallmem query.fasta -id 0.9 -centroids nr.fasta -uc clusters.uc
-2.大内存
+### 2.大内存
 
     usearch -cluster_fast query.fasta -id 0.9 -centroids nr.fasta -uc clusters.uc
 
-qsub 提交命令:
+## qsub 提交命令:
 
     qsub -cwd -q middle.q tesh.sh
 
-##给文件加上title or header
+## 给文件加上title or header
 
     for m in $(ls test*);do echo -e "name1\tname2" | cat - $m > /tmp/out && mv /tmp/out $m;done
 
 
-###### tophat批处理命令 ####
+##tophat批处理命令
     find . -name "*_1.fastq" | xargs basename -s "_1.fastq" | xargs -P 2 -I{} tophat -p 1 -g 1 -N 2 -G /data1/wuzefeng/genome.db/maize/gtf/Zea_mays.AGPv3.31.chr.gtf -o /data2/WZF/TEST/{} --library-type fr-unstranded -I 30000 --no-discordant --no-mixed --no-coverage-search {}_1.fastq {}_2.fastq
 
 
-find . ­name "*.sh" | xargs ­I{} sh {}
+    find . ­name "*.sh" | xargs ­I{} sh {}
 
-find /directory -name "*pattern*" | xargs awk '{z=FILENAME".txt";print $8>z}'
+    find /directory -name "*pattern*" | xargs awk '{z=FILENAME".txt";print $8>z}'
 
-find -name "accepted_hits.bam" | xargs -I{} du -lhs {} | sort -n  #查看文件大小
+    find -name "accepted_hits.bam" | xargs -I{} du -lhs {} | sort -n  #查看文件大小
 
-find  -name "*.abinitio.gtf.gz" | xargs -n 1000 rm -f  #快速删除大量文件
+    find  -name "*.abinitio.gtf.gz" | xargs -n 1000 rm -f  #快速删除大量文件
 
 *********tesh.sh*********************************************************************************************************
 #!/bin/sh														*
