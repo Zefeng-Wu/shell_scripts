@@ -530,3 +530,6 @@ conda info -e #查看环境列表
 
 ## 配置输入输出文件.cfg文件
 fc_run [-h] config [logger]
+
+## bam 文件修改reads name （reads name 太长会使samtools报错）##
+    awk '{if($1~/^@/)print $0; else u=split($0,m,"_");$1=m[1]"_"m[2]; print $0}' 1minimap2.sam > 2minmap2.modified.samdata
