@@ -397,45 +397,45 @@ sudo umount /media/matlab
 ##序列共线性
 genoPlotR
 
-###########安装jdk java (oracle java比open jdk好)
-sudo add-apt-repository ppa:webupd8team/java
-sudo apt-get update
-sudo apt-get install oracle-java7-installer
-sudo apt-get install oracle-java8-installer
-sudo update-java-alternatives -s java-7-oracle #配置默认java版本7
-sudo update-java-alternatives -s java-8-oracle #配置默认java版本8
+## 安装jdk java (oracle java比open jdk好)
+    sudo add-apt-repository ppa:webupd8team/java
+    sudo apt-get update
+    sudo apt-get install oracle-java7-installer
+    sudo apt-get install oracle-java8-installer
+    sudo update-java-alternatives -s java-7-oracle #配置默认java版本7
+    sudo update-java-alternatives -s java-8-oracle #配置默认java版本8
 
-##########判断某个路径下时候生成文件
-for m in $(ls); do if [ ! -f "$m/accepted_hits.bam.htseq.out" ]; then echo $m;fi; done
+## 判断某个路径下是否生成文件
+    for m in $(ls); do if [ ! -f "$m/accepted_hits.bam.htseq.out" ]; then echo $m;fi; done
 
-############统计染色体长度
-samtools faidx sample.fa
-cut -f1-2 sample.fa.fai
+## 统计染色体长度
+    samtools faidx sample.fa
+    cut -f1-2 sample.fa.fai
 
-##########统计文件大小
-find -name "accepted_hits.bam" | xargs du -h 
+## 统计文件大小
+    find -name "accepted_hits.bam" | xargs du -h 
 
-###########两行合并一行
-sed 'N;s/\n/\t/' maizie.mapping_rate
- awk 'ORS=NR%2?"\t":"\n"{print}' #多行变一行
-awk '{printf "%s",/^>/ ? $0" ":$0"\n" }' contig.fa  #fasta序列多行变一行
-awk '/^>/&&NR>1{print "";}{ printf "%s",/^>/ ? $0" ":$0 }' test.fa
+## 两行合并一行
+    sed 'N;s/\n/\t/' maizie.mapping_rate
+    awk 'ORS=NR%2?"\t":"\n"{print}' #多行变一行
+    awk '{printf "%s",/^>/ ? $0" ":$0"\n" }' contig.fa  #fasta序列多行变一行
+    awk '/^>/&&NR>1{print "";}{ printf "%s",/^>/ ? $0" ":$0 }' test.fa
 
-####升级python library
-pip install -U numpy
+## 升级python library
+    pip install -U numpy
 
-####查看python模块包路径
-python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()"
+## 查看python模块包路径
+    python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()"
 
 ########安装maftools需要另外两个python模块，在sonlib模块时，要改变make文件的./bin目录
 安装maftools需要git下载安装，否则出错
 
-##################### symap4 to circos link data
-awk '{print "at"$1,$4,$5,"at"$2,$6,$7}' blocks  >/home/wuzefeng/MyResearch/Imprinting_prediction/imprint_gene_list/TAIR10/circos/data/ara_link.data
+## symap4 to circos link data
+    awk '{print "at"$1,$4,$5,"at"$2,$6,$7}' blocks  >/home/wuzefeng/MyResearch/Imprinting_prediction/imprint_gene_list/TAIR10/circos/data/ara_link.data
 
 
-####################### grep 特定文件名并移动到另外目录
-find -name "*.fa" | xargs grep -l contig |xargs -I{}  mv {} ../   # -l 匹配contig的文件并转移
+## grep 特定文件名并移动到另外目录
+    find -name "*.fa" | xargs grep -l contig |xargs -I{}  mv {} ../   # -l 匹配contig的文件并转移
 
 
 ########################## excel 条件格式
@@ -448,8 +448,8 @@ find -name "*.fa" | xargs grep -l contig |xargs -I{}  mv {} ../   # -l 匹配con
 在顶部赋值栏输入“0”；
 最后，敲击键盘“Ctrl+Enter”组合键，给所选单元格赋“0”的值；
 
-############## 批量删除进程
-kill -9 `ps -ef |grep "/usr/lib/R/bin/exec/R --slave --no-restore -e paralle" |awk '{print $2}'`
+## 批量删除进程
+    kill -9 `ps -ef |grep "/usr/lib/R/bin/exec/R --slave --no-restore -e paralle" |awk '{print $2}'`
 
 
 
@@ -468,68 +468,66 @@ cufflink
 1.如果单个样本，也可以根据mapping的bam文件，根据参考gtf进行表达量定量
 2.多个样本，推荐单独组装单个样本,然后用cuffmerge合并， 然后用cuffdiff根据融合的gff文件计算每个样本的表达量，以及差异表达。
 
-# 根据基因id提取gtf文件对应id的上一行和下一行内容
- for m in $(cat test);do grep -A1 -B1 $m test.gtf| grep -v $m;done 
+## 根据基因id提取gtf文件对应id的上一行和下一行内容
+    for m in $(cat test);do grep -A1 -B1 $m test.gtf| grep -v $m;done 
+    grep --no-group-separator -A1  "aa" test # grep 上一行
 
-grep --no-group-separator -A1  "aa" test # grep 上一行
+## steme:
+    steme --minw=6 --maxw=14 --bg-model-order=5 --bg-fasta-file=/home/wuzefeng/MyResearch/Imprinting_prediction/imprint_gene_list/TAIR10/4imp_vs_non_imp_tf_enrich/imp_and_unimp_promoter/unimp_promoter.fa --output-dir=/home/wuzefeng/MyResearch/Imprinting_prediction/imprint_gene_list/TAIR10/4imp_vs_non_imp_tf_enrich/denovo/ /home/wuzefeng/MyResearch/Imprinting_prediction/imprint_gene_list/TAIR10/4imp_vs_non_imp_tf_enrich/imp_and_unimp_promoter/imp_promoter.fa 
 
-steme:
-steme --minw=6 --maxw=14 --bg-model-order=5 --bg-fasta-file=/home/wuzefeng/MyResearch/Imprinting_prediction/imprint_gene_list/TAIR10/4imp_vs_non_imp_tf_enrich/imp_and_unimp_promoter/unimp_promoter.fa --output-dir=/home/wuzefeng/MyResearch/Imprinting_prediction/imprint_gene_list/TAIR10/4imp_vs_non_imp_tf_enrich/denovo/ /home/wuzefeng/MyResearch/Imprinting_prediction/imprint_gene_list/TAIR10/4imp_vs_non_imp_tf_enrich/imp_and_unimp_promoter/imp_promoter.fa 
+## gtf文件提取蛋白编码基因id
+    awk '$3=="gene"' Arabidopsis_thaliana.TAIR10.31.gtf | grep protein_coding | awk '{print $10}' | sed 's/"//g' | sed 's/;//g' > protein_gene_ids
 
+# gtf 文件过滤蛋白编码的基因信息
+    for m in $(find -name *.gtf); do echo $m; grep "protein_coding" $m > ${m::-4}.protein_coding.gtf; done
 
-
-gtf2protein_gene_ids
-awk '$3=="gene"' Arabidopsis_thaliana.TAIR10.31.gtf | grep protein_coding | awk '{print $10}' | sed 's/"//g' | sed 's/;//g' > protein_gene_ids
-
-for m in $(find -name *.gtf); do echo $m; grep "protein_coding" $m > ${m::-4}.protein_coding.gtf; done
-
-##文件名通配符
-ll *[!RV][!similar][1-9].motif
+## 文件名通配符
+    ll *[!RV][!similar][1-9].motif
 
 
-### beast
-java -jar -Djava.library.path=$BEAST_LIB:/usr/local/lib beast.jar -beagle_info
+## beast
+    java -jar -Djava.library.path=$BEAST_LIB:/usr/local/lib beast.jar -beagle_info
 
 
 ## bam文件取uniqe mapping结果(注意会丢掉header的)
-samtools view -h accepted_hits.bam | grep -E '^@|NH:i:1' | samtools view -Sb - > uniquely_mapped.bam
+    samtools view -h accepted_hits.bam | grep -E '^@|NH:i:1' | samtools view -Sb - > uniquely_mapped.bam
 
 
-##
-for m in $(ls -d */promoter/);do echo $m; done
+## 文件匹配
+    for m in $(ls -d */promoter/);do echo $m; done
 
-##deep tools
-bamCoverage  --normalizeUsingRPKM  --numberOfProcessors 8 -b H3K4me3.bam  -o ../8reads_coverage/H3K4me3_cheng.bw
-computeMatrix scale-regions -S H3K4me3_cheng.bw -R gene.bed -a 1000 -b 1000 -out aa.out --numberOfProcessors 8
-plotProfile --matrixFile  aa.out  -out H3K4me3.pdf --plotFileFormat pdf
+## deep tools
+    bamCoverage  --normalizeUsingRPKM  --numberOfProcessors 8 -b H3K4me3.bam  -o ../8reads_coverage/H3K4me3_cheng.bw
+    computeMatrix scale-regions -S H3K4me3_cheng.bw -R gene.bed -a 1000 -b 1000 -out aa.out --numberOfProcessors 8
+    plotProfile --matrixFile  aa.out  -out H3K4me3.pdf --plotFileFormat pdf
 
 
-###设定脚本执行时间(一次性)
-at -f at.sh -t 1708182112
+## 设定脚本执行时间(一次性)
+    at -f at.sh -t 1708182112
 
 ## Juicebox(下载数据)
-juicebox_tools.7.5.jar dump norm KR https://hicfiles.s3.amazonaws.com/hiseq/gm12878/in-situ/combined.hic  BP 250000 1 1 GM12878_combined_250Kb_kr_norm.txt
+    juicebox_tools.7.5.jar dump norm KR https://hicfiles.s3.amazonaws.com/hiseq/gm12878/in-situ/combined.hic  BP 250000 1 1 GM12878_combined_250Kb_kr_norm.txt
 
 ## vcftools
-vcftools --gzvcf 1001genomes_snp-short-indel_only_ACGTN.vcf.gz --freq --chr 1 --out chr1_analysis #计算1号染色体等位基因频率
-vcftools --vcf input_file.vcf --remove-indels --recode --recode-INFO-all --out SNPs_only #删除indel 位点
-vcftools --gzvcf input_file1.vcf.gz --gzdiff input_file2.vcf.gz --diff-site --out in1_v_in2 # 比较两个vcf文件
-vcftools --bcf input_file.bcf --hardy --max-missing 1.0 --out output_noMissing # 哈迪温伯格p-value
-vcftools --gzvcf 1001genomes_snp-short-indel_only_ACGTN.vcf.gz --site-pi  --chr 1 --out nucleotide_diversity # 输出pi值
+    vcftools --gzvcf 1001genomes_snp-short-indel_only_ACGTN.vcf.gz --freq --chr 1 --out chr1_analysis #计算1号染色体等位基因频率
+    vcftools --vcf input_file.vcf --remove-indels --recode --recode-INFO-all --out SNPs_only #删除indel 位点
+    vcftools --gzvcf input_file1.vcf.gz --gzdiff input_file2.vcf.gz --diff-site --out in1_v_in2 # 比较两个vcf文件
+    vcftools --bcf input_file.bcf --hardy --max-missing 1.0 --out output_noMissing # 哈迪温伯格p-value
+    vcftools --gzvcf 1001genomes_snp-short-indel_only_ACGTN.vcf.gz --site-pi  --chr 1 --out nucleotide_diversity # 输出pi值
 
 ## footprint
-wellington_footprints.py DNase_peaks.bed  ../7good_bam/DNaseI.bam  footprint/  -o Ara_leaf -p 7
+    wellington_footprints.py DNase_peaks.bed  ../7good_bam/DNaseI.bam  footprint/  -o Ara_leaf -p 7
 
 
 
-### conda
-conda create -n pb-assembly  pb-assembly  #创建名为pb-assembly环境，并安装pb-assembly
-source activate my_env #激活环境
-conda info -e #查看环境列表
+## conda
+    conda create -n pb-assembly  pb-assembly  #创建名为pb-assembly环境，并安装pb-assembly
+    source activate my_env #激活环境
+    conda info -e #查看环境列表
 
 
 ## 配置输入输出文件.cfg文件
-fc_run [-h] config [logger]
+    fc_run [-h] config [logger]
 
 ## bam 文件修改reads name （reads name 太长会使samtools报错）##
     awk '{if($1~/^@/)print $0; else u=split($0,m,"_");$1=m[1]"_"m[2]; print $0}' 1minimap2.sam > 2minmap2.modified.samdata
