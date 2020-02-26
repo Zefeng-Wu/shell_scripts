@@ -115,24 +115,29 @@ for m in $(ls *.ht); do sed -i '/warning/d' $m; done
 
 四、匹配功能（p）
 1.从头匹配
-sed -n '/object/p' filename			#搜索匹配字符的行并打印（p）；-n参数不加的话会打印原行内容
+
+    sed -n '/object/p' filename			#搜索匹配字符的行并打印（p）；-n参数不加的话会打印原行内容
 2.指定每行匹配的位置（^和$）
-sed -n '/^object/p' filename			#搜索匹配行首是object的行，并打印
+
+    sed -n '/^object/p' filename			#搜索匹配行首是object的行，并打印
 3.匹配其他
-sed -n '/.at/p'  filename			# .代表除了换行符以外的所有字符后紧跟at
-sed -n '/[0,1,2,3....][0,1,2,3...]/p'	        # 匹配多位【a-b】数字
-sed -n '/ie*k/p' filename			#匹配ieek，ieeek之类的，多个e
-sed -n '1,3p' filename >out			#匹配1-3行输出,
+
+    sed -n '/.at/p'  filename			# .代表除了换行符以外的所有字符后紧跟at
+    sed -n '/[0,1,2,3....][0,1,2,3...]/p'	        # 匹配多位【a-b】数字
+    sed -n '/ie*k/p' filename			#匹配ieek，ieeek之类的，多个e
+    sed -n '1,3p' filename >out			#匹配1-3行输出,
 #注意单引号和双引号的区别,双引号和$连用时,会阻止其替换作用
- for m in $(ls *.sra| awk 'BEGIN{FS="."}{print $1}'); do sed -i "/${m}/d" list; echo $m;done  #根据当前路径下产生的文件,对原来的文件进行修改并删除
- sed -n '4~4p' SRR037881.fastq $ 打印4的倍数行
+
+     for m in $(ls *.sra| awk 'BEGIN{FS="."}{print $1}'); do sed -i "/${m}/d" list; echo $m;done  #根据当前路径下产生的文件,对原来的文件进行修改并删除
+     sed -n '4~4p' SRR037881.fastq $ 打印4的倍数行
 #修改fasta文件header　名字
-sed 's/^\(>.*\)$/\1 Brassica rapa/' infile
-awk '/^>/ {$0=$0 " Brassica rapa"}1' in.fa >out.fa　　　#1条件为真时
-awk '/^>/{$0=$1}1'  ara.cds >ara.cds2
-awk '{for (m=1;m<=NF;m+=3){printf $m"\t"}}{print "\n"}' test | sed -e /^$/d -e s'/\t$//g'
-awk '$11+0<1e-5' parent2nocoding.blat.txt  > p2n_1e-5.txt  # 科学计数法
-cat test.fq | awk 'BEGIN{RS="@";FS="\n"}; $1~/read_name/{print ">"$1"\n"$2; exit}' >query_reads.fa #提取fqstq 的reads
+
+    sed 's/^\(>.*\)$/\1 Brassica rapa/' infile
+    awk '/^>/ {$0=$0 " Brassica rapa"}1' in.fa >out.fa　　　#1条件为真时
+    awk '/^>/{$0=$1}1'  ara.cds >ara.cds2
+    awk '{for (m=1;m<=NF;m+=3){printf $m"\t"}}{print "\n"}' test | sed -e /^$/d -e s'/\t$//g'
+    awk '$11+0<1e-5' parent2nocoding.blat.txt  > p2n_1e-5.txt  # 科学计数法
+    cat test | while read LINE; do echo $LINE; cat test.fq| awk 'BEGIN{RS="@";FS="\n"}; $1~/'$LINE'/{print ">"$1"\n"$2; exit}' ;done #从test文件获得reads name 然后在test.fq中提取reads name
 **************************************************************************************************************************
 
 Sort排序
