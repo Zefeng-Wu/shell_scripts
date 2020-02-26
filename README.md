@@ -132,6 +132,7 @@ awk '/^>/ {$0=$0 " Brassica rapa"}1' in.fa >out.fa　　　#1条件为真时
 awk '/^>/{$0=$1}1'  ara.cds >ara.cds2
 awk '{for (m=1;m<=NF;m+=3){printf $m"\t"}}{print "\n"}' test | sed -e /^$/d -e s'/\t$//g'
 awk '$11+0<1e-5' parent2nocoding.blat.txt  > p2n_1e-5.txt  # 科学计数法
+cat test.fq | awk 'BEGIN{RS="@";FS="\n"}; $1~/read_name/{print ">"$1"\n"$2; exit}' >query_reads.fa #提取fqstq 的reads
 **************************************************************************************************************************
 
 Sort排序
