@@ -537,3 +537,6 @@ cufflink
 
 ## bam 文件修改reads name （reads name 太长会使samtools报错）##
     awk '{if($1~/^@/)print $0; else u=split($0,m,"_");$1=m[1]"_"m[2]; print $0}' 1minimap2.sam > 2minmap2.modified.samdata
+    
+## hisat mapping结果统计
+    grep "Overall alignment rate" *.txt | sed 's/\.txt:.Overall alignment rate://g' > mapping rate
