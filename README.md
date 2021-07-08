@@ -540,3 +540,61 @@ cufflink
     
 ## hisat mapping结果统计
     grep "Overall alignment rate" *.txt | sed 's/\.txt:.Overall alignment rate://g' > mapping rate
+
+##
+#! /bin/sh
+
+# 按照制定分辨率修改图片
+convert -resize 358x441 武泽峰照片.jpeg 武泽峰照片2.jpg # 一寸照片
+
+#批量杀死有道辞典进程
+ps -aux | grep tesseract | awk '{print $2}' | xargs kill -9
+
+#统计ensembl plants 基因组fasta文件的染色体长度
+grep ">" ../genome.db/Arabidopsis_thaliana.TAIR10.dna.toplevel.fa | awk 'OFS="\t" {u=split($3,m,":")}{print m[3],m[4],m[5]}'
+
+
+# HiC data analysis
+
+#hicexplorer 
+# Setep 1
+hisat2-build -p 8 genome_mm10/mm10.fa hisat2/mm10_index # build index
+hisat2 -x hisat2/mm10_index --threads 8 -U ../original_data/SRR1956527_1.fastq.gz --reorder | samtools view -Shb - > SRR1956527_1.bam # mapping to ref genome
+hisat2 -x hisat2/mm10_index --threads 8 -U ../original_data/SRR1956527_2.fastq.gz --reorder | samtools view -Shb - > SRR1956527_2.bam # mapping to ref genome for another pair
+
+# Step 2
+mkdir hicMatrix
+hicBuildMatrix --samFiles SRR1956527_1.bam SRR1956527_2.bam --binSize 10000 --restrictionSequence GATC --danglingSequence GATC --restrictionCutFile cut_sites.bed --outBam SRR1956527_ref.bam --outFileName hicMatrix/SRR1956527_10kb.h5 --QCfolder hicMatrix/SRR1956527_10kb_QC --threads 8 --inputBufferSize 400000 # build hic matrix
+
+# Step 3
+hicSumMatrices --matrices hicMatrix/SRR1956527_10kb.h5 hicMatrix/SRR1956528_10kb.h5  hicMatrix/SRR1956529_10kb.h5 --outFileName hicMatrix/replicateMerged_10kb.h5 #Merge (sum) matrices from replicates
+hicMergeMatrixBins --matrix hicMatrix/replicateMerged_10kb.h5 --numBins 100 --outFileName hicMatrix/replicateMerged.100bins.h5 #Merge matrix bins for plotting
+
+# Step4
+mkdir plots
+hicPlotMatrix --matrix hicMatrix/replicateMerged.100bins.h5 --log1p --dpi 300 --clearMaskedBins --chromosomeOrder chr1 chr2 chr3 chr4 chr5 chr6 chr7 chr8 chr9 chr10 chr11 chr12 chr13 chr14 chr15 chr16 chr17 chr18 chr19 chrX chrY --colorMap jet --title "Hi-C matrix for mESC" --outFileName plots/plot_1Mb_matrix.png # Plot the corrected Hi-C matrix
+
+# Step5 
+hicMergeMatrixBins --matrix hicMatrix/replicateMerged_10kb.h5 --numBins 2 --outFileName hicMatrix/replicateMerged.matrix_20kb.h5
+hicCorrectMatrix correct --chromosomes 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 X Y --matrix hicMatrix/replicateMerged.matrix_20kb.h5 --filterThreshold -2 3 --perchr --outFileName hicMatrix/replicateMerged.Corrected_20kb.h5
+
+# Step6
+mkdir TADs
+hicFindTADs --matrix hicMatrix/replicateMerged.Corrected_20kb.h5 --minDepth 60000 --maxDepth 120000 --numberOfProcessors 8 --step 20000 --outPrefix TADs/marks_et-al_TADs_20kb-Bins  --minBoundaryDistance 80000 --correctForMultipleTesting fdr --threshold 0.05 # call TAD
+hicPlotTADs --tracks track.ini --region X:98000000-105000000 --dpi 300 --outFileName plots/marks_et-al_TADs.png --title "Marks et. al. TADs on X" # Plot TAD track
+
+
+
+## 内网穿透，外网访问
+服务器（linux）
+1.下载ngrok
+2. unzip /path/to/ngrok.zip
+3. /ngrok authtoken 1tFUNeSTeWyS50TaAODHhEqeHkB_7zCbYPVB8Bzo4rmi89ENG # 配置密钥
+3 ./ngrok tcp 22  # 服务器开启远程端口转发ssh服务，并得到如下信息，每次都不一样
+# tcp://6.tcp.ngrok.io:16218                                                                                                                  
+4. 远程shh登陆服务器
+ssh -p 16218  wuzefeng@6.tcp.ngrok.io # 输入密码即可
+
+## tar.gz 转换deb包
+sudo get-apt install alien
+sudo alien --to-deb *.tar.gz #很费内存、CPU
